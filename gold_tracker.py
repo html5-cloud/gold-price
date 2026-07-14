@@ -304,7 +304,7 @@ def _chart_html(dates, series, series_prem, default_visible, range_months, minma
     mode_bar = f"""    <div class="grp"><span class="seg-label">模式</span>
       <div class="seg" id="segMode">
         <button onclick="setMode('price',this)" class="on">价格</button>
-        <button onclick="setMode('prem',this)">溢价 · 较{ref_name}</button>
+        <button onclick="setMode('prem',this)" title="每条线 = 店价 − 当日{ref_name}">溢价</button>
       </div>
     </div>""" if has_prem else ""
 
@@ -364,6 +364,20 @@ h1 em{{font-style:italic;color:var(--gold-lt)}}
 .tp .hd{{color:var(--gold-lt);font-weight:500;margin-bottom:3px;border-bottom:1px solid rgba(217,164,65,.25);padding-bottom:3px}}
 .tp .sep{{margin:5px 0 4px;border-top:1px dashed rgba(255,255,255,.14)}}
 .tp .hi{{color:#f0a58c}} .tp .lo{{color:#8fc3e6}}
+@media (max-width:640px){{
+  .wrap{{padding:20px 12px 20px}}
+  .eyebrow{{font-size:10px;letter-spacing:.22em}}
+  h1{{margin:8px 0 5px}}
+  .meta{{font-size:11px}}
+  .card{{margin-top:16px;padding:12px 10px 6px;border-radius:14px}}
+  .controls{{justify-content:flex-start;gap:10px 14px;padding:2px 0 10px}}
+  .grp{{gap:7px}}
+  .seg button{{padding:7px 13px;font-size:13px}}
+  .seg-label{{font-size:9px;letter-spacing:.14em}}
+  .hint{{font-size:10px;line-height:1.5}}
+  #c{{height:60vh;min-height:340px}}
+  .note{{font-size:10px;padding-top:12px}}
+}}
 </style></head>
 <body>
 <div class="wrap">
@@ -410,7 +424,7 @@ function tip(ps){{
 ch.setOption({{
  color:PALETTE,
  textStyle:{{fontFamily:'"IBM Plex Mono","Manrope",monospace',color:'#9a8f7d'}},
- tooltip:{{trigger:'axis',formatter:tip,
+ tooltip:{{trigger:'axis',confine:true,formatter:tip,
    backgroundColor:'rgba(16,14,11,.94)',borderColor:'rgba(217,164,65,.35)',borderWidth:1,
    padding:[9,11],textStyle:{{color:'#f0ebdf',fontSize:12}},
    axisPointer:{{type:'line',lineStyle:{{color:'rgba(217,164,65,.4)',type:'dashed'}}}},
@@ -458,7 +472,17 @@ function setMode(m,btn){{
   ch.setOption({{series: m==='price'?SERIES_PRICE:SERIES_PREM,
                  yAxis:{{name: m==='price'?'元/克':'溢价 元/克'}}}});
 }}
-window.addEventListener('resize',function(){{ch.resize()}});
+function applyResp(){{
+  var sm=window.innerWidth<=640;
+  ch.setOption({{
+    grid:{{left:sm?42:56,right:sm?14:26,top:sm?48:52,bottom:sm?52:62}},
+    legend:{{itemGap:sm?10:16,textStyle:{{fontSize:sm?11:12}}}},
+    xAxis:{{axisLabel:{{fontSize:sm?9:11}}}},
+    yAxis:{{axisLabel:{{fontSize:sm?9:11}},nameTextStyle:{{fontSize:sm?9:11}}}}
+  }});
+}}
+applyResp();
+window.addEventListener('resize',function(){{ch.resize();applyResp();}});
 </script></body></html>"""
 
 
