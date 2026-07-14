@@ -1,0 +1,13 @@
+# 生成产物:HTML/图在云端(或本地)按需重新生成,不进仓库
+output/
+_site/
+update.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 系统
+.DS_Store

@@ -1,0 +1,62 @@
+name: 更新数据并部署
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 13 * * *"   # 每天 UTC 13:23 = 北京时间 21:23 自动刷新
+  workflow_dispatch:          # 支持手动触发
+
+permissions:
+  contents: write   # 允许把每日抓取的新数据 commit 回仓库
+  pages: write      # 允许发布到 GitHub Pages
+  id-token: write
+
+# 同一时间只跑一个,避免部署互相打架
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 抓取最新金价并生成走势图(抓取失败则用已有数据兜底)
+        run: |
+          python3 gold_tracker.py update || echo "update 部分失败,改用仓库里已有数据继续"
+          python3 gold_tracker.py chart
+
+      - name: 把更新后的数据提交回仓库
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "数据无变化,跳过提交"
+          else
+            git commit -m "chore: 每日金价更新 $(date -u +%F) [skip ci]"
+            git push
+          fi
+
+      - name: 组装静态站点(trend.html 作为首页)
+        run: |
+          rm -rf _site && mkdir -p _site
+          cp output/*.html output/*.csv _site/ 2>/dev/null || true
+          cp output/trend.html _site/index.html
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

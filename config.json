@@ -1,0 +1,26 @@
+{
+  "_comment": "追踪的金店黄金价格。brandId 来自 cngold.org;新增/删除金店直接改这里。product_name 是要抓的品种名(脚本按此名在每家店的品种里解析出对应 productId,因为各店 productId 不同)。",
+  "start_date": "2020-01-01",
+  "product_name": "黄金价格",
+  "source": "https://www.cngold.org/sgapp/price/gold",
+  "brands": [
+    { "name": "周大福", "brandId": 2880 },
+    { "name": "老凤祥", "brandId": 2881 },
+    { "name": "周六福", "brandId": 2882 },
+    { "name": "六福",   "brandId": 2883 },
+    { "name": "菜百",   "brandId": 2884 },
+    { "name": "老庙",   "brandId": 2885 },
+    { "name": "周生生", "brandId": 2887 },
+    { "name": "周大生", "brandId": 2889 },
+    { "name": "中国黄金", "brandId": 2894, "product_name": "零售价" }
+  ],
+  "_baseline_comment": "交易所金价基准线(上海金交所),数据源为金融界 jijinhao 历史接口,取日收盘价。用作对比基线,可看出各金店的品牌溢价。",
+  "baselines": [
+    { "name": "上海金交所黄金T+D", "jijinhao_code": "JO_9753" }
+  ],
+  "_chart_comment": "走势图默认视图。default_visible=打开时默认勾选的线(其余在图例里可手动点开);default_range_months=默认时间窗(月),0=全部。基准线始终默认显示。",
+  "chart": {
+    "default_visible": ["周大福"],
+    "default_range_months": 12
+  }
+}
