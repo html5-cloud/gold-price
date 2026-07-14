@@ -24,11 +24,13 @@ python3 gold_tracker.py chart      # 只用已存数据重新生成走势图
 ## 每日自动更新(可选)
 
 手动:每天跑一次 `python3 gold_tracker.py` 即可增量补当天。
-自动:加一条 crontab(每天 20:00):
+自动:加一条 crontab(每天 08:00):
 
 ```
-0 20 * * * cd ~/projects/gold-price-tracker && /usr/bin/python3 gold_tracker.py >> update.log 2>&1
+0 8 * * * cd ~/projects/gold-price-tracker && /usr/bin/python3 gold_tracker.py >> update.log 2>&1
 ```
+
+> 注:如果已用 GitHub Actions 云端每日更新(见下方部署),就不需要本地 crontab 了。
 
 ## 部署到 GitHub Pages(push 自动部署 + 每日自动更新)
 
