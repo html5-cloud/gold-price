@@ -311,6 +311,7 @@ def _chart_html(dates, series, series_prem, default_visible, range_months, minma
     return f"""<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>黄金价格指数 · 金店 vs 交易所</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Cpath fill=%27%23d9a441%27 d=%27M14 20h36l8 28H6z%27/%3E%3Cpath fill=%27%23f3d37b%27 d=%27M14 20l10-8h16l10 8z%27/%3E%3Cpath fill=%27%238f641c%27 d=%27M6 48h52l-5 6H11z%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -357,8 +358,6 @@ h1 em{{font-style:italic;color:var(--gold-lt)}}
 .hint{{font-family:var(--mono);font-size:11px;color:var(--faint);padding:0 2px 6px;letter-spacing:.02em}}
 .hint b{{color:var(--gold);font-weight:500}}
 #c{{width:100%;height:64vh;min-height:430px}}
-.note{{text-align:center;color:var(--faint);font-size:11.5px;font-family:var(--mono);
-  padding:16px 0 0;letter-spacing:.02em}}
 .tp{{font-family:var(--mono)}}
 .tp .row{{display:flex;justify-content:space-between;gap:18px;line-height:1.7}}
 .tp .hd{{color:var(--gold-lt);font-weight:500;margin-bottom:3px;border-bottom:1px solid rgba(217,164,65,.25);padding-bottom:3px}}
@@ -376,7 +375,6 @@ h1 em{{font-style:italic;color:var(--gold-lt)}}
   .seg-label{{font-size:9px;letter-spacing:.14em}}
   .hint{{font-size:10px;line-height:1.5}}
   #c{{height:60vh;min-height:340px}}
-  .note{{font-size:10px;padding-top:12px}}
 }}
 </style></head>
 <body>
@@ -399,7 +397,6 @@ h1 em{{font-style:italic;color:var(--gold-lt)}}
     <div class="hint">默认显示 <b>周大福</b> + 交易所基准 · 点上方图例可开关其他金店 · 悬停查看当日全网最高 / 最低</div>
     <div id="c"></div>
   </div>
-  <div class="note">数据来源:cngold.org 网友金店报价 + 金融界上海金交所行情 · 与门店实际有差异,仅供参考</div>
 </div>
 <script>
 var DATES={json.dumps(dates)};
@@ -465,20 +462,25 @@ function setRange(months,btn){{
   }}
   ch.dispatchAction({{type:'dataZoom',startValue:sv,endValue:last}});
 }}
+function axisTitle(){{
+  return MODE==='price'?'元/克':'溢价 元/克';
+}}
 function setMode(m,btn){{
   MODE=m;
   document.querySelectorAll('#segMode button').forEach(function(b){{b.classList.remove('on')}});
   if(btn) btn.classList.add('on');
   ch.setOption({{series: m==='price'?SERIES_PRICE:SERIES_PREM,
-                 yAxis:{{name: m==='price'?'元/克':'溢价 元/克'}}}});
+                 yAxis:{{name:window.innerWidth<=640?'':axisTitle()}}}});
 }}
 function applyResp(){{
   var sm=window.innerWidth<=640;
   ch.setOption({{
     grid:{{left:sm?42:56,right:sm?14:26,top:sm?48:52,bottom:sm?52:62}},
-    legend:{{itemGap:sm?10:16,textStyle:{{fontSize:sm?11:12}}}},
+    legend:{{left:sm?8:'center',right:sm?8:null,itemWidth:sm?14:16,itemGap:sm?18:16,
+      textStyle:{{fontSize:sm?11:12}}}},
     xAxis:{{axisLabel:{{fontSize:sm?9:11}}}},
-    yAxis:{{axisLabel:{{fontSize:sm?9:11}},nameTextStyle:{{fontSize:sm?9:11}}}}
+    yAxis:{{name:sm?'':axisTitle(),axisLabel:{{fontSize:sm?9:11}},
+      nameTextStyle:{{fontSize:sm?9:11}}}}
   }});
 }}
 applyResp();
